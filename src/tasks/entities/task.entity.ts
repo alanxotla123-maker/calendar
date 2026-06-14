@@ -12,11 +12,14 @@ export class Task {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ type: 'timestamp' })
-  dueDate: Date;
+  @Column({ type: 'timestamp', nullable: true })
+  dueDate?: Date;
 
   @Column({ default: false })
   isCompleted: boolean;
+
+  @Column({ nullable: true })
+  userEmail?: string;
 
   @ManyToOne(() => Category, (category) => category.tasks, { onDelete: 'SET NULL', nullable: true })
   category?: Category;

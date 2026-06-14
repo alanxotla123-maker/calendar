@@ -14,9 +14,9 @@ export class TasksService {
     private readonly categoriesService: CategoriesService,
   ) {}
 
-  async create(createTaskDto: CreateTaskDto): Promise<Task> {
+  async create(createTaskDto: CreateTaskDto, userEmail?: string): Promise<Task> {
     const { categoryId, ...taskData } = createTaskDto;
-    const task = this.taskRepository.create(taskData);
+    const task = this.taskRepository.create({ ...taskData, userEmail });
 
     if (categoryId) {
       task.category = await this.categoriesService.findOne(categoryId);
@@ -25,16 +25,24 @@ export class TasksService {
     return await this.taskRepository.save(task);
   }
 
-  async findAll(): Promise<Task[]> {
+  async findAll(userEmail?: string): Promise<Task[]> {
+    const whereClause = userEmail ? { userEmail } : {};
     return await this.taskRepository.find({
+      where: whereClause,
       relations: { category: true },
-      order: { dueDate: 'ASC' },
+      order: {
+        dueDate: {
+          direction: 'ASC',
+          nulls: 'LAST',
+        } as any,
+      },
     });
   }
 
-  async findOne(id: string): Promise<Task> {
+  async findOne(id: string, userEmail?: string): Promise<Task> {
+    const whereClause = userEmail ? { id, userEmail } : { id };
     const task = await this.taskRepository.findOne({
-      where: { id },
+      where: whereClause,
       relations: { category: true },
     });
     if (!task) {
@@ -43,9 +51,9 @@ export class TasksService {
     return task;
   }
 
-  async update(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
+  async update(id: string, updateTaskDto: UpdateTaskDto, userEmail?: string): Promise<Task> {
     const { categoryId, ...taskData } = updateTaskDto;
-    const task = await this.findOne(id);
+    const task = await this.findOne(id, userEmail);
 
     this.taskRepository.merge(task, taskData);
 
@@ -56,8 +64,8 @@ export class TasksService {
     return await this.taskRepository.save(task);
   }
 
-  async remove(id: string): Promise<void> {
-    const task = await this.findOne(id);
+  async remove(id: string, userEmail?: string): Promise<void> {
+    const task = await this.findOne(id, userEmail);
     await this.taskRepository.remove(task);
   }
 }

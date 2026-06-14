@@ -18,6 +18,9 @@ export class Saving {
   @Column({ type: 'timestamp', nullable: true })
   targetDate?: Date;
 
+  @Column({ nullable: true })
+  userEmail?: string;
+
   @ManyToOne(() => Category, (category) => category.savings, { onDelete: 'SET NULL', nullable: true })
   category?: Category;
 

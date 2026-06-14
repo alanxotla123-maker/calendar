@@ -9,9 +9,9 @@ export class CreateTaskDto {
   @IsString()
   description?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsDateString()
-  dueDate: string;
+  dueDate?: string;
 
   @IsOptional()
   @IsBoolean()
