@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('tasks')
 export class Task {
@@ -20,6 +21,9 @@ export class Task {
 
   @Column({ nullable: true })
   userEmail?: string;
+
+  @ManyToOne(() => User, (user) => user.tasks, { onDelete: 'CASCADE', nullable: true })
+  user?: User;
 
   @ManyToOne(() => Category, (category) => category.tasks, { onDelete: 'SET NULL', nullable: true })
   category?: Category;

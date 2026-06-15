@@ -5,6 +5,7 @@ import { Saving } from './entities/saving.entity';
 import { CreateSavingDto } from './dto/create-saving.dto';
 import { UpdateSavingDto } from './dto/update-saving.dto';
 import { CategoriesService } from '../categories/categories.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class SavingsService {
@@ -12,11 +13,19 @@ export class SavingsService {
     @InjectRepository(Saving)
     private readonly savingRepository: Repository<Saving>,
     private readonly categoriesService: CategoriesService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(createSavingDto: CreateSavingDto, userEmail?: string): Promise<Saving> {
     const { categoryId, ...savingData } = createSavingDto;
     const saving = this.savingRepository.create({ ...savingData, userEmail });
+
+    if (userEmail) {
+      const user = await this.usersService.findByEmail(userEmail);
+      if (user) {
+        saving.user = user;
+      }
+    }
 
     if (categoryId) {
       saving.category = await this.categoriesService.findOne(categoryId);

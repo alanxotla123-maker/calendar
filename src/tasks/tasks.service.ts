@@ -5,6 +5,7 @@ import { Task } from './entities/task.entity';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CategoriesService } from '../categories/categories.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class TasksService {
@@ -12,11 +13,19 @@ export class TasksService {
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>,
     private readonly categoriesService: CategoriesService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(createTaskDto: CreateTaskDto, userEmail?: string): Promise<Task> {
     const { categoryId, ...taskData } = createTaskDto;
     const task = this.taskRepository.create({ ...taskData, userEmail });
+
+    if (userEmail) {
+      const user = await this.usersService.findByEmail(userEmail);
+      if (user) {
+        task.user = user;
+      }
+    }
 
     if (categoryId) {
       task.category = await this.categoriesService.findOne(categoryId);
