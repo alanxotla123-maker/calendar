@@ -7,6 +7,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { TasksModule } from './tasks/tasks.module';
 import { SavingsModule } from './savings/savings.module';
 import { UsersModule } from './users/users.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -20,11 +21,13 @@ import { UsersModule } from './users/users.module';
       database: process.env.DB_NAME ?? 'calendar_savings',
       autoLoadEntities: true,
       synchronize: true,
+      ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     }),
     CategoriesModule,
     TasksModule,
     SavingsModule,
     UsersModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
