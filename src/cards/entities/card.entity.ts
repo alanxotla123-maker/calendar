@@ -19,6 +19,9 @@ export class Card {
   @Column({ type: 'int', default: 5 })
   dueDate: number;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0.00 })
+  initialSpent: number;
+
   @Column({ nullable: true })
   userEmail?: string;
 
