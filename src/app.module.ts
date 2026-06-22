@@ -8,6 +8,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { SavingsModule } from './savings/savings.module';
 import { UsersModule } from './users/users.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { CardsModule } from './cards/cards.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TransactionsModule } from './transactions/transactions.module';
     SavingsModule,
     UsersModule,
     TransactionsModule,
+    CardsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

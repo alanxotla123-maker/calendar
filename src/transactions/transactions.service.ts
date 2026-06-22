@@ -6,6 +6,7 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { CategoriesService } from '../categories/categories.service';
 import { UsersService } from '../users/users.service';
+import { CardsService } from '../cards/cards.service';
 
 @Injectable()
 export class TransactionsService {
@@ -14,10 +15,11 @@ export class TransactionsService {
     private readonly transactionRepository: Repository<Transaction>,
     private readonly categoriesService: CategoriesService,
     private readonly usersService: UsersService,
+    private readonly cardsService: CardsService,
   ) {}
 
   async create(createTransactionDto: CreateTransactionDto, userEmail?: string): Promise<Transaction> {
-    const { categoryId, ...transactionData } = createTransactionDto;
+    const { categoryId, cardId, ...transactionData } = createTransactionDto;
     const transaction = this.transactionRepository.create({ ...transactionData, userEmail });
 
     if (userEmail) {
@@ -31,6 +33,10 @@ export class TransactionsService {
       transaction.category = await this.categoriesService.findOne(categoryId);
     }
 
+    if (cardId) {
+      transaction.card = await this.cardsService.findOne(cardId, userEmail);
+    }
+
     return await this.transactionRepository.save(transaction);
   }
 
@@ -38,7 +44,7 @@ export class TransactionsService {
     const whereClause = userEmail ? { userEmail } : {};
     return await this.transactionRepository.find({
       where: whereClause,
-      relations: { category: true },
+      relations: { category: true, card: true },
       order: { date: 'DESC' },
     });
   }
@@ -47,7 +53,7 @@ export class TransactionsService {
     const whereClause = userEmail ? { id, userEmail } : { id };
     const transaction = await this.transactionRepository.findOne({
       where: whereClause,
-      relations: { category: true },
+      relations: { category: true, card: true },
     });
     if (!transaction) {
       throw new NotFoundException(`Transaction with ID "${id}" not found`);
@@ -56,13 +62,17 @@ export class TransactionsService {
   }
 
   async update(id: string, updateTransactionDto: UpdateTransactionDto, userEmail?: string): Promise<Transaction> {
-    const { categoryId, ...transactionData } = updateTransactionDto;
+    const { categoryId, cardId, ...transactionData } = updateTransactionDto;
     const transaction = await this.findOne(id, userEmail);
 
     this.transactionRepository.merge(transaction, transactionData);
 
     if (categoryId !== undefined) {
       transaction.category = categoryId ? await this.categoriesService.findOne(categoryId) : undefined;
+    }
+
+    if (cardId !== undefined) {
+      transaction.card = cardId ? await this.cardsService.findOne(cardId, userEmail) : undefined;
     }
 
     return await this.transactionRepository.save(transaction);

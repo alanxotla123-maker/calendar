@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
+import { Card } from '../../cards/entities/card.entity';
 
 @Entity('transactions')
 export class Transaction {
@@ -27,6 +28,12 @@ export class Transaction {
 
   @ManyToOne(() => Category, { onDelete: 'SET NULL', nullable: true })
   category?: Category;
+
+  @Column({ nullable: true })
+  cardId?: string;
+
+  @ManyToOne(() => Card, (card) => card.transactions, { onDelete: 'SET NULL', nullable: true })
+  card?: Card;
 
   @CreateDateColumn()
   createdAt: Date;
