@@ -9,6 +9,8 @@ import { SavingsModule } from './savings/savings.module';
 import { UsersModule } from './users/users.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { CardsModule } from './cards/cards.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { CardsModule } from './cards/cards.module';
     UsersModule,
     TransactionsModule,
     CardsModule,
+    ScheduleModule.forRoot(),
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
